@@ -21,10 +21,178 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/comercios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar Comercios */
+        get: operations["listar_comercios_api_v1_comercios_get"];
+        put?: never;
+        /** Crear Comercio */
+        post: operations["crear_comercio_api_v1_comercios_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comercios/{comercio_id}/autorizaciones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar Autorizaciones */
+        get: operations["listar_autorizaciones_api_v1_comercios__comercio_id__autorizaciones_get"];
+        put?: never;
+        /** Registrar Autorizacion */
+        post: operations["registrar_autorizacion_api_v1_comercios__comercio_id__autorizaciones_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar Datasets */
+        get: operations["listar_datasets_api_v1_datasets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener Dataset */
+        get: operations["obtener_dataset_api_v1_datasets__dataset_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/versiones/{version}/calidad": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Calidad Version */
+        get: operations["calidad_version_api_v1_datasets__dataset_id__versiones__version__calidad_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/{dataset_id}/versiones/{version}/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Series Version */
+        get: operations["series_version_api_v1_datasets__dataset_id__versiones__version__series_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/datasets/carga": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cargar Ventas */
+        post: operations["cargar_ventas_api_v1_datasets_carga_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AutorizacionCreate */
+        AutorizacionCreate: {
+            /**
+             * Fecha
+             * Format: date
+             */
+            fecha: string;
+            /** Alcance */
+            alcance: string;
+            /** Documento Ref */
+            documento_ref?: string | null;
+        };
+        /** AutorizacionOut */
+        AutorizacionOut: {
+            /** Id */
+            id: number;
+            /** Comercio Id */
+            comercio_id: number;
+            /**
+             * Fecha
+             * Format: date
+             */
+            fecha: string;
+            /** Alcance */
+            alcance: string;
+            /** Finalidad */
+            finalidad: string;
+            /** Documento Ref */
+            documento_ref: string | null;
+        };
+        /** Body_cargar_ventas_api_v1_datasets_carga_post */
+        Body_cargar_ventas_api_v1_datasets_carga_post: {
+            /**
+             * Archivo
+             * @description Plantilla de ventas en .csv o .xlsx
+             */
+            archivo: string;
+            /** Comercio Id */
+            comercio_id: number;
+            /** Autorizacion Id */
+            autorizacion_id: number;
+            /**
+             * Nombre
+             * @default Ventas
+             */
+            nombre: string;
+        };
         /**
          * Capacidades
          * @description Recursos de c�mputo paralelo detectados en el servidor.
@@ -36,6 +204,97 @@ export interface components {
             mpi4py: boolean;
             /** Cuda */
             cuda: boolean;
+        };
+        /** CargaOut */
+        CargaOut: {
+            /** Dataset Id */
+            dataset_id: number;
+            version: components["schemas"]["DatasetVersionOut"];
+            /**
+             * Nueva
+             * @description False si el mismo archivo ya se hab�a cargado.
+             */
+            nueva: boolean;
+            /** Reporte Calidad */
+            reporte_calidad: {
+                [key: string]: unknown;
+            };
+        };
+        /** ComercioCreate */
+        ComercioCreate: {
+            /** Municipio */
+            municipio: string;
+            /** Tipo Negocio */
+            tipo_negocio?: string | null;
+        };
+        /** ComercioOut */
+        ComercioOut: {
+            /** Id */
+            id: number;
+            /** Codigo Seudonimo */
+            codigo_seudonimo: string;
+            /** Municipio */
+            municipio: string;
+            /** Tipo Negocio */
+            tipo_negocio: string | null;
+        };
+        /** DatasetOut */
+        DatasetOut: {
+            /** Id */
+            id: number;
+            /** Nombre */
+            nombre: string;
+            origen: components["schemas"]["OrigenDatos"];
+            /** Fuente */
+            fuente: string;
+            /** Frecuencia */
+            frecuencia: string;
+            /** Comercio Id */
+            comercio_id: number | null;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+            /** Versiones */
+            versiones: components["schemas"]["DatasetVersionOut"][];
+        };
+        /** DatasetVersionOut */
+        DatasetVersionOut: {
+            /** Id */
+            id: number;
+            /** Version */
+            version: number;
+            /** Sha256 */
+            sha256: string;
+            /** Archivo Original */
+            archivo_original: string;
+            /** Filas */
+            filas: number;
+            /** Columnas Eliminadas */
+            columnas_eliminadas: string[];
+            /** Autorizacion Id */
+            autorizacion_id: number | null;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+        };
+        /** ErrorCargaOut */
+        ErrorCargaOut: {
+            /** Detalle */
+            detalle: string;
+            /**
+             * Problemas
+             * @default []
+             */
+            problemas: components["schemas"]["ProblemaOut"][];
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
         };
         /** HealthResponse */
         HealthResponse: {
@@ -52,6 +311,48 @@ export interface components {
              */
             base_de_datos: "ok" | "no_disponible";
             capacidades: components["schemas"]["Capacidades"];
+        };
+        /**
+         * OrigenDatos
+         * @enum {string}
+         */
+        OrigenDatos: "publico" | "transaccional" | "sintetico";
+        /** ProblemaOut */
+        ProblemaOut: {
+            /** Mensaje */
+            mensaje: string;
+            /** Fila */
+            fila?: number | null;
+            /** Columna */
+            columna?: string | null;
+        };
+        /** SerieOut */
+        SerieOut: {
+            /** Id */
+            id: number;
+            /** Clave */
+            clave: string;
+            /** Nivel */
+            nivel: string;
+            /** Observaciones */
+            observaciones: number;
+            /** Desde */
+            desde: string | null;
+            /** Hasta */
+            hasta: string | null;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
     };
     responses: never;
@@ -78,6 +379,295 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    listar_comercios_api_v1_comercios_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComercioOut"][];
+                };
+            };
+        };
+    };
+    crear_comercio_api_v1_comercios_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComercioCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComercioOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_autorizaciones_api_v1_comercios__comercio_id__autorizaciones_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comercio_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutorizacionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    registrar_autorizacion_api_v1_comercios__comercio_id__autorizaciones_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comercio_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutorizacionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutorizacionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_datasets_api_v1_datasets_get: {
+        parameters: {
+            query?: {
+                comercio_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_dataset_api_v1_datasets__dataset_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DatasetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calidad_version_api_v1_datasets__dataset_id__versiones__version__calidad_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: number;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    series_version_api_v1_datasets__dataset_id__versiones__version__series_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: number;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SerieOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cargar_ventas_api_v1_datasets_carga_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_cargar_ventas_api_v1_datasets_carga_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CargaOut"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorCargaOut"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorCargaOut"];
                 };
             };
         };

@@ -49,7 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Mis datos",
     description: "Cargue sus ventas y revise el reporte de calidad de cada archivo.",
     requirements: "RF-06 a RF-09, RF-59",
-    phase: "Fase 1 (Sprint 1)",
+    phase: "Disponible (Fase 1)",
   },
   {
     href: "/modelos",

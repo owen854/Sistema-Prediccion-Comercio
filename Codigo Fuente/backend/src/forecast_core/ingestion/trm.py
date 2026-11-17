@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -43,6 +44,12 @@ def parse_trm_rows(rows: list[dict[str, Any]], hasta: str | None = None) -> pd.D
     end = pd.Timestamp(hasta) if hasta else s.index.max()
     s = s.reindex(pd.date_range(s.index.min(), end, freq="D")).ffill()
     return s.rename_axis("date").reset_index()
+
+
+def load_trm_json(path: str | Path, hasta: str | None = None) -> pd.DataFrame:
+    """Lee la respuesta JSON guardada de la API y la convierte en serie diaria."""
+    rows = json.loads(Path(path).read_text(encoding="utf-8"))
+    return parse_trm_rows(rows, hasta)
 
 
 def fetch_trm(desde: str, hasta: str | None = None, timeout: int = 60) -> pd.DataFrame:

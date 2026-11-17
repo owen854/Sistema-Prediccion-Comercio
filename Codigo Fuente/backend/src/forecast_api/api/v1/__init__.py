@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-api_router = APIRouter()
+from forecast_api.api.v1 import datasets
 
-# Los routers de recursos se agregan aquí a partir de la Fase 1:
-# api_router.include_router(datasets.router, prefix="/datasets", tags=["datasets"])
+api_router = APIRouter()
+api_router.include_router(datasets.router, tags=["datos"])

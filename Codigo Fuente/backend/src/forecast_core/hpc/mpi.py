@@ -14,16 +14,33 @@ Sin ``mpi4py`` (por ejemplo, en Windows) :func:`mpi_map` ejecuta en secuencia.
 
 from __future__ import annotations
 
+import importlib
+import logging
 from collections.abc import Callable, Sequence
 from typing import Any
 
-try:  # pragma: no cover - depende del entorno
-    from mpi4py import MPI
+log = logging.getLogger(__name__)
 
-    MPI_AVAILABLE = True
-except ImportError:  # pragma: no cover - depende del entorno
-    MPI = None
-    MPI_AVAILABLE = False
+
+def _load_mpi() -> Any:
+    """Importa ``mpi4py.MPI`` si está disponible; si no, devuelve ``None`` (RNF-13).
+
+    Se carga con ``importlib`` para que ``MPI`` tenga el mismo tipo (``Any``) con y
+    sin mpi4py instalado; así mypy da el mismo resultado en Windows y en Linux.
+    mpi4py lanza ``RuntimeError`` (no ``ImportError``) cuando está instalado pero
+    falta la biblioteca MPI del sistema (p. ej. Windows sin MS-MPI).
+    """
+    try:
+        return importlib.import_module("mpi4py.MPI")
+    except ImportError:
+        return None
+    except RuntimeError as exc:
+        log.warning("mpi4py está instalado pero no encontró la biblioteca MPI: %s", exc)
+        return None
+
+
+MPI: Any = _load_mpi()
+MPI_AVAILABLE = MPI is not None
 
 
 def block_partition(n_items: int, n_parts: int) -> list[range]:

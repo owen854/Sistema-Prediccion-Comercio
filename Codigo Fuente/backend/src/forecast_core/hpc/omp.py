@@ -7,20 +7,25 @@ se usa la implementación de referencia en NumPy con la misma interfaz (RNF-13).
 
 from __future__ import annotations
 
-from typing import Literal
+import importlib
+from typing import Any, Literal
 
 import numpy as np
 
 from forecast_core.features import lags as _ref_lags
 from forecast_core.features import rolling as _ref_rolling
 
-try:  # pragma: no cover - depende del entorno
-    import forecast_hpc_kernels as _kernels
 
-    KERNELS_AVAILABLE = True
-except ImportError:  # pragma: no cover - depende del entorno
-    _kernels = None
-    KERNELS_AVAILABLE = False
+def _load_kernels() -> Any:
+    """Importa ``forecast_hpc_kernels`` si está compilado (mismo tipo en todo sistema)."""
+    try:
+        return importlib.import_module("forecast_hpc_kernels")
+    except ImportError:  # pragma: no cover - depende del entorno
+        return None
+
+
+_kernels: Any = _load_kernels()
+KERNELS_AVAILABLE = _kernels is not None
 
 Backend = Literal["auto", "numpy", "openmp"]
 

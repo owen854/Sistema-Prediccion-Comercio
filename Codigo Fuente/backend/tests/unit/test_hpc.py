@@ -58,6 +58,19 @@ def test_mpi_map_sin_mpi_es_secuencial() -> None:
     assert mpi_map(lambda t: t * 2, [1, 2, 3], comm=SinMPI()) == [2, 4, 6]
 
 
+@pytest.mark.parametrize("error", [ImportError("sin mpi4py"), RuntimeError("cannot load MPI")])
+def test_mpi_ausente_no_rompe_la_importacion(
+    monkeypatch: pytest.MonkeyPatch, error: Exception
+) -> None:
+    from forecast_core.hpc import mpi as mpi_mod
+
+    def falla(_: str) -> None:
+        raise error
+
+    monkeypatch.setattr(mpi_mod.importlib, "import_module", falla)
+    assert mpi_mod._load_mpi() is None
+
+
 def test_estrategias() -> None:
     assert isinstance(get_strategy("secuencial"), SequentialStrategy)
     assert get_strategy("secuencial").map_tasks(str, [1, 2]) == ["1", "2"]

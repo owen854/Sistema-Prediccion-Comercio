@@ -165,7 +165,19 @@ No hace falta instalar MPI ni CMake en Windows: el núcleo funciona en Windows e
 
 En este equipo hay **dos PostgreSQL escuchando en el puerto 5432**: el servicio `postgresql-x64-17` de Windows y el de WSL que instala `setup_wsl_hpc.sh`. Desde Windows, `localhost:5432` llega al de Windows (donde no existe el usuario `forecast`); desde WSL, al de WSL.
 
-Opciones, de la más simple a la más flexible:
+**Decisión del equipo (17/11/2026): el backend se ejecuta en WSL.** Pasos verificados en este equipo:
+
+1. Abrir **Ubuntu** e ir al proyecto:
+   `cd "/mnt/c/Users/PC/Documents/GitHub/Sistema-Prediccion-Comercio/Codigo Fuente"`
+2. Actualizar el entorno (solo cuando cambien dependencias): `cd backend && uv sync --extra hpc --extra kernels && cd ..`
+3. Aplicar migraciones: `make migrate`
+4. Registrar las series públicas (idempotente): `make importar-publicos`
+5. Levantar la API: `make api` → queda en `http://localhost:8000` y Windows la alcanza por ese mismo puerto.
+6. En **PowerShell** (Windows): `.\tasks.ps1 web` → `http://localhost:3000`. El panel debe mostrar base de datos, OpenMP y MPI como disponibles.
+
+La API se detiene con `Ctrl+C` en la terminal de Ubuntu. PostgreSQL de WSL arranca solo con Ubuntu (servicio habilitado).
+
+Otras opciones, por si cambia la decisión:
 
 | Opción | Qué hacer |
 |---|---|

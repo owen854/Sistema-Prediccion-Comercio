@@ -41,6 +41,9 @@ bash scripts/setup_wsl_hpc.sh
 
 ### Ejecutar
 
+El backend se ejecuta en **WSL** (en Windows hay otro PostgreSQL en el puerto 5432): en Ubuntu, `make migrate`, `make importar-publicos` y `make api`; en PowerShell, `.	asks.ps1 web`. Detalle en `Documentacion Tecnica/05_Entorno_Desarrollo_HPC.md`, sección 3.4.
+
+
 | Qué | Windows | WSL / Linux |
 |---|---|---|
 | API (http://localhost:8000/docs) | `.\tasks.ps1 api` | `make api` |

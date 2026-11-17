@@ -38,11 +38,12 @@ Estado: ✅ Hecho · 🟡 En curso / pendiente de una acción del equipo · ⬜ 
 
 | ID | Estado | Evidencia o pendiente |
 |---|---|---|
-| HU-06 | 🟡 | EMC (164 meses), Migración (174 meses; 3.411.542 entradas) y TRM descargadas, con hash en `data/manifest.json`. **Falta la historia del IPC por ciudades** (117 meses): el DANE solo publica el mes corriente en el anexo; se necesita el archivo original del informe en `data/raw/public/ipc_variacion_mensual_ciudades.csv`. |
+| HU-06 | 🟡 | EMC (164 meses), Migración (174 meses; 3.411.542 entradas) y TRM descargadas, con hash en `data/manifest.json`. **La historia real del IPC por ciudades sigue pendiente** (el DANE solo publica el mes corriente). Por decisión del equipo se usa un **IPC sintético etiquetado** (`ingest ipc-sintetico`) para probar el pipeline; no entra al panel de modelado. Alternativa real: reconstruir la serie desde los anexos mensuales del DANE. |
 | HU-07 | ✅ | `ingestion/calendar.py`: festivos de Colombia, quincenas, régimen de frontera y variables diarias y mensuales. Tres fechas de eventos siguen marcadas "verificar" en `configs/calendar_events.yaml`. |
-| HU-08 | 🟡 | `make reproduce-oe1`: **23 de 26 cifras coinciden** con el informe (Tabla IV y Patrones 1, 2 y 4) y se generan las Figuras 1, 2, 4 y 5. Faltan las 3 cifras y la Figura 3 del Patrón 3 (IPC). Hallazgo: el informe usó variaciones anuales en logaritmos (con variaciones porcentuales no se reproduce). |
+| HU-08 | ✅ | `make reproduce-oe1`: **23 de 26 cifras coinciden** con el informe (Tabla IV y Patrones 1, 2 y 4) y se generan las 5 figuras. Las 3 cifras del Patrón 3 se calculan con IPC sintético y quedan marcadas "sintético (no comparable)"; la Figura 3 lleva marca de agua. La evidencia real del Patrón 3 es la del informe. Hallazgo: el informe usó variaciones anuales en logaritmos (con variaciones porcentuales no se reproduce). |
 | HU-09 | ✅ | Plantilla `plantillas/plantilla_ventas_comercio.xlsx`; validación con errores por fila; eliminación de columnas personales; seudonimización HMAC; versionado por hash. Probado por API y desde la vista **Mis datos**. |
 | HU-10 | ✅ | 1.461.000 filas (1.000 series) en 0,8 s; panel en 0,4 s. |
+| — (entorno) | ✅ | Backend en WSL verificado: API en `localhost:8000` alcanzable desde Windows con base de datos, OpenMP y MPI disponibles. |
 | HU-11 | ✅ | Migración `0002` (autorizaciones, conjuntos, versiones, series, observaciones) aplicada en PostgreSQL de WSL; endpoints con pruebas de integración; `importar-publicos` idempotente. |
 | HU-12 | 🟡 | Borrador del formato en `07_Formato_Autorizacion_Datos.md` y registro de autorizaciones en la base. Falta la aprobación del director y la gestión con los comercios. |
 

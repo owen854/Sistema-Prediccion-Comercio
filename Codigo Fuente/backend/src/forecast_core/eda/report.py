@@ -57,6 +57,31 @@ def plot_seasonal_effects(dec: Decomposition, path: Path) -> Path:
     return _save(fig, path)
 
 
+def plot_inflation(local: pd.Series, national: pd.Series, path: Path, *, sintetico: bool) -> Path:
+    """Inflación anual de Cúcuta frente a la nacional; marca de agua si los datos son sintéticos."""
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(local.index, local, color=COLOR, lw=1.5, label="Cúcuta")
+    ax.plot(national.index, national, color=COLOR_2, lw=1.5, label="Nacional")
+    ax.set_title("Inflación anual de Cúcuta frente a la nacional")
+    ax.set_ylabel("Variación anual del IPC (%)")
+    ax.legend(frameon=False)
+    ax.grid(alpha=0.3)
+    if sintetico:
+        ax.text(
+            0.5,
+            0.5,
+            "DATOS SINTÉTICOS\nno es evidencia",
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=28,
+            color="#B91C1C",
+            alpha=0.25,
+            rotation=15,
+        )
+    return _save(fig, path)
+
+
 def plot_border_flows(entries: pd.Series, events: pd.DataFrame, path: Path) -> Path:
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(entries.index, entries / 1000, color=COLOR_2, lw=1.2)

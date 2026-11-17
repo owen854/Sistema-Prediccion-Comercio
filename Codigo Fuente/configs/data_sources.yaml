@@ -28,6 +28,9 @@ dane_ipc:
   # La historia 2017-2026 por ciudad se carga desde este CSV (columnas: fecha, ciudad, variacion_pct).
   archivo_historico: ipc_variacion_mensual_ciudades.csv
   estado: pendiente  # falta el archivo histórico original usado en el informe
+  # Mientras tanto: IPC SINTÉTICO en data/synthetic (python -m forecast_core.pipelines.ingest
+  # ipc-sintetico). Solo para probar el pipeline; no entra al panel ni se compara con el informe.
+  archivo_sintetico: ipc_variacion_mensual_ciudades_sintetico.csv
 
 migracion_colombia:
   descripcion: Entradas de extranjeros a Colombia por puesto migratorio

@@ -38,11 +38,14 @@ class Check:
     informe: float
     obtenido: float | None
     decimales: int
+    sintetico: bool = False  # calculado con datos sintéticos: nunca se compara con el informe
 
     @property
     def estado(self) -> str:
         if self.obtenido is None:
             return "pendiente"
+        if self.sintetico:
+            return "sintético (no comparable)"
         tol = 10 ** (-self.decimales) + 1e-9
         return "coincide" if abs(round(self.obtenido, 6) - self.informe) <= tol else "difiere"
 
@@ -59,7 +62,7 @@ class Check:
 
 def run() -> tuple[list[Check], dict[str, Path]]:
     cfg = load_yaml(SOURCES_CONFIG)
-    series = load_sources(cfg)
+    series = load_sources(cfg, permitir_sintetico=True)
     emc = series["emc_ventas_reales"]
     ent = series["entradas_norte_de_santander"]
     out = resolve_path(OUT_DIR)
@@ -118,12 +121,20 @@ def run() -> tuple[list[Check], dict[str, Path]]:
 
     # Patrón 3: inflación de Cúcuta (requiere la historia del IPC por ciudades)
     if "ipc_cucuta" in series and "ipc_nacional" in series:
-        gap = inflation.inflation_gap(series["ipc_cucuta"], series["ipc_nacional"])
+        cucuta, nacional = series["ipc_cucuta"], series["ipc_nacional"]
+        sint = cucuta.attrs.get("origin") == "sintetico"
+        gap = inflation.inflation_gap(cucuta, nacional)
         checks += [
-            Check("Patrón 3", "Brecha media de inflación (pp)", 0.72, gap.brecha_media, 2),
-            Check("Patrón 3", "Meses con Cúcuta por encima", 64, gap.meses_por_encima, 0),
-            Check("Patrón 3", "Brecha máxima (pp)", 3.98, gap.brecha_maxima, 2),
+            Check("Patrón 3", "Brecha media de inflación (pp)", 0.72, gap.brecha_media, 2, sint),
+            Check("Patrón 3", "Meses con Cúcuta por encima", 64, gap.meses_por_encima, 0, sint),
+            Check("Patrón 3", "Brecha máxima (pp)", 3.98, gap.brecha_maxima, 2, sint),
         ]
+        figs["fig3"] = report.plot_inflation(
+            inflation.annual_inflation(cucuta),
+            inflation.annual_inflation(nacional),
+            out / "fig3_inflacion_cucuta_nacional.png",
+            sintetico=sint,
+        )
     else:
         checks += [
             Check("Patrón 3", "Brecha media de inflación (pp)", 0.72, None, 2),

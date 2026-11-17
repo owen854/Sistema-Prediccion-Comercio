@@ -4,6 +4,7 @@ Uso::
 
     python -m forecast_core.pipelines.ingest descargar      # baja las fuentes y las registra
     python -m forecast_core.pipelines.ingest procesar       # construye el panel mensual
+    python -m forecast_core.pipelines.ingest ipc-sintetico  # IPC sintético (solo pruebas)
 
 ``procesar`` lee los archivos de ``data/raw/public`` (según ``configs/data_sources.yaml``),
 guarda cada serie limpia en ``data/interim/``, el panel mensual común en
@@ -17,12 +18,14 @@ import argparse
 import json
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
 from forecast_core.config import load_yaml, resolve_path
-from forecast_core.ingestion import common, dane_emc, dane_ipc, migracion, trm
+from forecast_core.ingestion import common, dane_emc, dane_ipc, migracion, synthetic, trm
+from forecast_core.types import DataOrigin
 from forecast_core.validation.quality import quality_report
 
 SOURCES_CONFIG = "configs/data_sources.yaml"
@@ -73,8 +76,33 @@ def download_sources(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     return entries
 
 
-def load_sources(cfg: dict[str, Any]) -> dict[str, pd.Series]:
-    """Lee las fuentes disponibles en disco y devuelve series mensuales (inicio de mes)."""
+SYNTHETIC_DIR = Path("data") / "synthetic"
+
+
+def write_synthetic_cpi(cfg: dict[str, Any]) -> Path:
+    """Genera la historia SINTÉTICA del IPC por ciudades en ``data/synthetic``."""
+    ipc = cfg["dane_ipc"]
+    path = resolve_path(SYNTHETIC_DIR / ipc["archivo_sintetico"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    periodo = ipc["periodo_informe"]
+    synthetic.generate_city_cpi(start=periodo["inicio"], end=periodo["fin"]).to_csv(
+        path, index=False, encoding="utf-8"
+    )
+    common.register_in_manifest(
+        path,
+        fuente="Generador sintético (forecast_core.ingestion.synthetic.generate_city_cpi)",
+        descripcion="IPC SINTÉTICO por ciudades: solo para probar el pipeline, no es evidencia.",
+    )
+    return path
+
+
+def load_sources(cfg: dict[str, Any], *, permitir_sintetico: bool = False) -> dict[str, pd.Series]:
+    """Lee las fuentes disponibles en disco y devuelve series mensuales (inicio de mes).
+
+    El IPC por ciudades se toma del archivo histórico real si existe. Si no, y solo si
+    ``permitir_sintetico`` es verdadero, se usa el sintético; esas series llevan
+    ``attrs["origin"] = "sintetico"`` y nunca entran al panel de modelado.
+    """
     raw = resolve_path(RAW)
     series: dict[str, pd.Series] = {}
     series["emc_ventas_reales"] = dane_emc.parse_emc_index(
@@ -93,15 +121,24 @@ def load_sources(cfg: dict[str, Any]) -> dict[str, pd.Series]:
     trm_monthly = trm_daily.resample("MS").mean().rename("trm_promedio_mensual")
     series["trm_promedio_mensual"] = trm_monthly
 
-    ipc_csv = raw / cfg["dane_ipc"]["archivo_historico"]
-    if ipc_csv.exists():
-        wide = dane_ipc.load_city_history_csv(ipc_csv)
-        base = cfg["dane_ipc"]["reconstruccion_indice"]["base"]
-        for ciudad, nombre in (("Cúcuta", "ipc_cucuta"), ("Nacional", "ipc_nacional")):
-            if ciudad in wide.columns:
-                series[nombre] = dane_ipc.index_from_monthly_variation(
-                    wide[ciudad].dropna().rename(nombre), base_date=base
-                )
+    ipc = cfg["dane_ipc"]
+    real_csv = raw / ipc["archivo_historico"]
+    synthetic_csv = resolve_path(SYNTHETIC_DIR / ipc["archivo_sintetico"])
+    if real_csv.exists():
+        ipc_csv, origin = real_csv, DataOrigin.PUBLICO
+    elif permitir_sintetico and synthetic_csv.exists():
+        ipc_csv, origin = synthetic_csv, DataOrigin.SINTETICO
+    else:
+        return series
+    wide = dane_ipc.load_city_history_csv(ipc_csv)
+    base = ipc["reconstruccion_indice"]["base"]
+    for ciudad, nombre in (("Cúcuta", "ipc_cucuta"), ("Nacional", "ipc_nacional")):
+        if ciudad in wide.columns:
+            s = dane_ipc.index_from_monthly_variation(
+                wide[ciudad].dropna().rename(nombre), base_date=base
+            )
+            s.attrs["origin"] = origin.value
+            series[nombre] = s
     return series
 
 
@@ -151,9 +188,12 @@ def process(cfg: dict[str, Any]) -> dict[str, Any]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Ingesta de fuentes públicas")
-    parser.add_argument("accion", choices=["descargar", "procesar"])
+    parser.add_argument("accion", choices=["descargar", "procesar", "ipc-sintetico"])
     args = parser.parse_args(argv)
     cfg = load_yaml(SOURCES_CONFIG)
+    if args.accion == "ipc-sintetico":
+        print(f"IPC SINTÉTICO generado en {write_synthetic_cpi(cfg)} (no es evidencia).")
+        return 0
     if args.accion == "descargar":
         for e in download_sources(cfg):
             print(f"{e['archivo']}  {e['bytes']:>9} bytes  sha256={e['sha256'][:12]}…")

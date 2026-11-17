@@ -36,6 +36,15 @@
       "bytes": 422394,
       "sha256": "3d240aa2b0cdad184d4d4766cc6c3095e34957e51cecb74bb4e1a367494339e2",
       "registrado_en": "2026-11-17T22:38:17+00:00"
+    },
+    {
+      "archivo": "data/synthetic/ipc_variacion_mensual_ciudades_sintetico.csv",
+      "fuente": "Generador sintético (forecast_core.ingestion.synthetic.generate_city_cpi)",
+      "url": null,
+      "descripcion": "IPC SINTÉTICO por ciudades: solo para probar el pipeline, no es evidencia.",
+      "bytes": 8304,
+      "sha256": "808d6e93839418834738f5b2eb0a16ddee43813e40f5ce0f2596ef9cc2863ee2",
+      "registrado_en": "2026-11-17T23:23:34+00:00"
     }
   ]
 }

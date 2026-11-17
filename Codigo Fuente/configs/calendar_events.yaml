@@ -1,0 +1,53 @@
+# Calendario de eventos (RF-05). Las fechas de frontera vienen del Informe de evidencia
+# OE1/OE2 (sección III-A, referencias [24] y [25]). "precision" indica qué tan exacta es la
+# fecha según la fuente; las marcadas con verificar: true se confirman en la Fase 1.
+
+festivos:
+  fuente: biblioteca holidays (país CO), calculados por año
+
+quincenas:
+  # Supuesto a validar con datos de comercios (Fase 1): pagos el 15 y el último día del mes.
+  dias_pago: [15, ultimo_dia]
+  ventana: { dias_antes: 1, dias_despues: 2 }
+
+temporadas:
+  - { nombre: diciembre, meses: [12] }
+
+eventos_frontera:
+  - id: cierre_2015
+    tipo: cierre
+    inicio: "2015-08-19"
+    precision: dia
+    fuente: "[24] Radio Nacional de Colombia, 25-sep-2022"
+  - id: reapertura_peatonal_2016
+    tipo: reapertura_parcial
+    inicio: "2016"
+    precision: anio
+    verificar: true
+    fuente: "[24]"
+  - id: ruptura_2019
+    tipo: cierre
+    inicio: "2019-02"
+    precision: mes
+    verificar: true
+    fuente: "[24]"
+  - id: pandemia_2020
+    tipo: cierre
+    inicio: "2020-03"
+    precision: mes
+    verificar: true
+    fuente: "[24]"
+  - id: reapertura_venezolana_2021
+    tipo: reapertura_parcial
+    inicio: "2021-10-05"
+    precision: dia
+    fuente: "[25] Deutsche Welle / T13, 5-oct-2021"
+  - id: reapertura_total_2022
+    tipo: reapertura
+    inicio: "2022-09-26"
+    precision: dia
+    fuente: "[24]"
+
+periodos_atipicos:
+  # Excluido en la correlación cruzada del informe (inflaba la correlación a 0,63).
+  - { id: pandemia, inicio: "2020-03", fin: "2022-02" }

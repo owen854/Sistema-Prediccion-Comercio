@@ -1,0 +1,21 @@
+# Estrategias de ejecución (RF-38) y configuraciones de medición (RF-40).
+# Dónde se mide cada tecnología: Documentacion Tecnica/05_Entorno_Desarrollo_HPC.md
+
+estrategia_por_defecto: secuencial   # secuencial | mpi (Fase 0); openmp | cuda | mpi_cuda (Fase 3)
+
+openmp:
+  hilos: [1, 2, 4, 8]       # equipo de desarrollo: 4 núcleos físicos, 8 hilos lógicos
+  backend: auto             # auto | numpy | openmp
+
+mpi:
+  procesos: [1, 2, 4]       # 8 con --oversubscribe se reporta aparte (hilos lógicos)
+  lanzador: mpiexec
+
+cuda:
+  dispositivo_preferido: cuda   # cae a cpu si no hay GPU (RNF-13)
+  entorno: colab                # el equipo de desarrollo no tiene GPU NVIDIA (ADR-005)
+
+medicion:
+  repeticiones: 5
+  calentamiento: 1
+  estadistico: mediana

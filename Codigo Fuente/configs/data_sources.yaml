@@ -1,0 +1,42 @@
+# Fuentes de datos (RF-01 a RF-04). Periodos y reglas tomados del Informe de evidencia
+# OE1/OE2 (Tablas III y IV). La Fase 1 debe reproducir esos conteos de meses.
+
+dane_emc:
+  descripcion: Índice de ventas reales del comercio minorista, total sin otros vehículos (base 2019 = 100)
+  pagina: https://www.dane.gov.co/index.php/estadisticas-por-tema/comercio-interno/encuesta-mensual-de-comercio-emc
+  frecuencia: MS
+  nivel: nacional
+  periodo_informe: { inicio: "2013-01", fin: "2026-08", meses: 164 }
+  nota: >
+    El anexo departamental publica solo 6 departamentos y "Otros departamentos"; no incluye
+    Norte de Santander. La demanda regional se aproxima con la serie nacional (limitación del informe).
+
+dane_ipc:
+  descripcion: Variación mensual del IPC por ciudades
+  pagina: https://www.dane.gov.co/index.php/estadisticas-por-tema/precios-y-costos/indice-de-precios-al-consumidor-ipc
+  frecuencia: MS
+  ciudades: [Cúcuta, Nacional]
+  periodo_informe: { inicio: "2017-01", fin: "2026-09", meses: 117 }
+  reconstruccion_indice: { base: "2016-12", valor_base: 100 }
+
+migracion_colombia:
+  descripcion: Entradas de extranjeros a Colombia por puesto migratorio
+  portal: https://www.datos.gov.co
+  dataset_id: pendiente  # confirmar el identificador Socrata en la Fase 1
+  frecuencia: MS
+  puestos_norte_de_santander: 5  # puentes de Cúcuta, aeropuerto Camilo Daza y Puerto Santander
+  periodo_informe: { inicio: "2012-01", fin: "2026-06", meses: 174 }
+  faltantes:
+    "2020-04": 0  # sin registros por cierre de la frontera; se toma como 0 entradas (informe)
+  registros_sin_puesto: excluir  # 106 de 44,9 millones en el informe
+
+trm:
+  descripcion: Tasa de Cambio Representativa del Mercado COP/USD (Superintendencia Financiera)
+  api: https://www.datos.gov.co/resource/32sa-8pi3.json
+  dataset_id: 32sa-8pi3
+  frecuencia: D
+  relleno: hacia_adelante  # fines de semana y festivos toman la última TRM vigente
+
+panel_lstm_informe:
+  descripcion: Panel de ventas y entradas usado por el piloto LSTM
+  periodo: { inicio: "2013-01", fin: "2026-06", meses: 162 }

@@ -1,0 +1,29 @@
+# Réplica del piloto LSTM del Informe de evidencia OE1/OE2 (sección IV-B, Tabla VII).
+# Resultado de referencia: MAPE medio 3,82 % (3,61 %–4,09 %) con flujos fronterizos.
+
+nombre: e04_lstm_publico
+objetivo: OE2
+datos:
+  panel: panel_lstm_informe          # configs/data_sources.yaml
+  frecuencia: MS
+  variables: configs/features.yaml#mensual
+modelo:
+  tipo: lstm
+  unidades: 8
+  capas: 1
+  ensamble_redes: 5
+  epocas: 400
+  optimizador: adam
+validacion:
+  metodo: origen_movil
+  primer_origen: "2024-07"
+  ultimo_origen: "2026-06"
+  horizonte: 1
+  paso: 1
+  reentrenar_en_cada_origen: true
+semillas:
+  grupos: 4
+  por_grupo: 5
+comparar_con: [ingenuo_estacional, ingenuo]
+metricas: [rmse, mape]
+estrategia: secuencial

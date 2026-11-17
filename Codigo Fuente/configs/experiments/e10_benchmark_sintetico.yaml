@@ -1,0 +1,15 @@
+# Medición de rendimiento paralelo con datos SINTÉTICOS (RF-40, RNF-03 a RNF-05).
+# Spike de la Fase 0: python -m forecast_core.pipelines.benchmark {omp|mpi|resumen}
+
+nombre: e10_benchmark_sintetico
+objetivo: OE3
+datos:
+  origen: sintetico
+  series: [100, 500, 1000]
+  dias: 1460
+  semilla: 42
+pruebas:
+  openmp: { operacion: media_movil, ventana: 28, hilos: [1, 2, 4, 8] }
+  mpi: { operacion: origen_movil, particiones: 24, horizonte: 14, paso: 7, procesos: [1, 2, 4] }
+  cuda: { operacion: entrenamiento_lstm_multiserie, comparar: cpu_vs_gpu_misma_sesion }
+repeticiones: 5

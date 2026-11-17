@@ -1,0 +1,12 @@
+# Política de inventario (RF-47 a RF-50). Se implementa en la Fase 4.
+
+nivel_servicio_objetivo: 0.95   # probabilidad de no quedarse sin stock durante la reposición
+stock_seguridad:
+  metodo: error_pronostico      # desviación del error del pronóstico (no desviación de la demanda)
+  fuente_incertidumbre: intervalos_prediccion
+riesgo:
+  critico: "stock <= stock_seguridad o cobertura <= tiempo_reposicion"
+  preventivo: "stock <= punto_reorden"
+simulacion_retrospectiva:
+  politica_comparada: ingenuo_estacional  # aproximación a la planeación empírica del comercio
+  indicadores: [nivel_servicio, quiebres_stock, inventario_promedio, rotacion, costo]

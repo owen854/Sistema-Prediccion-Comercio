@@ -4,7 +4,7 @@
 BACKEND := backend
 FRONTEND := frontend
 
-.PHONY: setup-wsl test test-all lint typecheck api web kernels-test bench-omp bench-mpi gen-api migrate
+.PHONY: setup-wsl test test-all lint typecheck api web kernels-test bench-omp bench-mpi gen-api migrate datos reproduce-oe1 importar-publicos
 
 setup-wsl:            ## Instala todo en WSL (pide contraseña para apt)
 	bash scripts/setup_wsl_hpc.sh
@@ -26,6 +26,16 @@ typecheck:
 
 migrate:
 	cd $(BACKEND) && uv run alembic upgrade head
+
+datos:                ## Descarga las fuentes públicas y construye el panel mensual
+	cd $(BACKEND) && uv run python -m forecast_core.pipelines.ingest descargar
+	cd $(BACKEND) && uv run python -m forecast_core.pipelines.ingest procesar
+
+reproduce-oe1:        ## Regenera las cifras y figuras del OE1 y las compara con el informe
+	cd $(BACKEND) && uv run python -m forecast_core.pipelines.reproduce_oe1
+
+importar-publicos:    ## Registra las series públicas en la base de datos
+	cd $(BACKEND) && uv run python -m forecast_api.cli importar-publicos
 
 api:
 	cd $(BACKEND) && uv run uvicorn forecast_api.main:app --reload --host 0.0.0.0

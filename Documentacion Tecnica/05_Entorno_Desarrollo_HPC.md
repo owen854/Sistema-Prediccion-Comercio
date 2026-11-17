@@ -161,7 +161,19 @@ No hace falta instalar MPI ni CMake en Windows: el núcleo funciona en Windows e
 | CMake | `winget install Kitware.CMake` | Solo sirve si además se instala MSVC. |
 | MSVC (Build Tools) | `winget install Microsoft.VisualStudio.2022.BuildTools` con la carga "Desarrollo de escritorio con C++" (~6 GB) | Necesario para compilar extensiones de Python en Windows; el g++ de MSYS2 no es compatible con el Python oficial. **No recomendado**: WSL ya resuelve esto. |
 
-### 3.4 Editor
+### 3.4 PostgreSQL de Windows y de WSL (conflicto de puerto)
+
+En este equipo hay **dos PostgreSQL escuchando en el puerto 5432**: el servicio `postgresql-x64-17` de Windows y el de WSL que instala `setup_wsl_hpc.sh`. Desde Windows, `localhost:5432` llega al de Windows (donde no existe el usuario `forecast`); desde WSL, al de WSL.
+
+Opciones, de la más simple a la más flexible:
+
+| Opción | Qué hacer |
+|---|---|
+| Ejecutar el backend en WSL (recomendada) | `make api`, `make migrate` e `importar-publicos` desde la terminal de Ubuntu. El frontend en Windows llega a la API por `localhost:8000`. |
+| Cambiar el puerto del PostgreSQL de WSL | En Ubuntu: `sudo sed -i "s/^#\?port = 5432/port = 5433/" /etc/postgresql/*/main/postgresql.conf && sudo service postgresql restart`, y en Windows usar `FORECAST_DATABASE_URL=postgresql+psycopg://forecast:forecast@localhost:5433/forecast`. |
+| Usar el PostgreSQL de Windows | Crear el usuario y la base `forecast` con pgAdmin o `psql` de Windows (requiere la contraseña de `postgres` de esa instalación). |
+
+### 3.5 Editor
 
 Se recomienda VS Code con la extensión **WSL**: se abre la carpeta del repositorio desde Ubuntu (`code .`) y el terminal, el intérprete de Python y las pruebas corren en Linux, mientras los archivos siguen en `C:\Users\PC\Documents\GitHub\…`.
 

@@ -1,5 +1,5 @@
 # Atajos para Windows (equivalentes al Makefile). Uso:  .\tasks.ps1 <tarea>
-#   setup | test | lint | typecheck | api | web | gen-api
+#   setup | test | lint | typecheck | api | web | gen-api | datos | reproduce-oe1
 param([Parameter(Mandatory = $true)][string]$Tarea)
 $ErrorActionPreference = "Stop"
 $Backend = Join-Path $PSScriptRoot "backend"
@@ -22,5 +22,12 @@ switch ($Tarea) {
   "api" { Push-Location $Backend; python -m uv run uvicorn forecast_api.main:app --reload; Pop-Location }
   "web" { Push-Location $Frontend; npm run dev; Pop-Location }
   "gen-api" { Push-Location $Frontend; npm run gen:api; Pop-Location }
-  default { Write-Error "Tarea desconocida: $Tarea. Opciones: setup, test, lint, typecheck, api, web, gen-api" }
+  "datos" {
+    Push-Location $Backend
+    python -m uv run python -m forecast_core.pipelines.ingest descargar
+    python -m uv run python -m forecast_core.pipelines.ingest procesar
+    Pop-Location
+  }
+  "reproduce-oe1" { Push-Location $Backend; python -m uv run python -m forecast_core.pipelines.reproduce_oe1; Pop-Location }
+  default { Write-Error "Tarea desconocida: $Tarea. Opciones: setup, test, lint, typecheck, api, web, gen-api, datos, reproduce-oe1" }
 }

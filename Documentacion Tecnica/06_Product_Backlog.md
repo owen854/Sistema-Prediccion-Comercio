@@ -12,10 +12,10 @@ Estado: ✅ Hecho · 🟡 En curso / pendiente de una acción del equipo · ⬜ 
 | ID | Historia | Estado | Evidencia o pendiente |
 |---|---|---|---|
 | HU-01 | Estructura de `Codigo Fuente/` con herramientas configuradas | ✅ | Estructura de la arquitectura (sección 10); ruff, mypy, pytest, ESLint, Vitest sin errores |
-| HU-02 | Integración continua en cada *pull request* | 🟡 | `.github/workflows/ci.yml` creado (backend con MPI y núcleos, C++, frontend). Se verifica en GitHub al primer *push*. |
+| HU-02 | Integración continua en cada *pull request* | ✅ | PR #1: backend (con mpi4py y núcleos OpenMP compilados), núcleos C++ y frontend en verde |
 | HU-03 | Módulos del prototipo como paquete probado | ✅ | `tests/equivalence/test_regresion_prototipo.py`: resultados idénticos al prototipo; métricas, origen móvil y líneas base al 100 % de cobertura |
-| HU-04 | Levantar base de datos, API y frontend con un comando | 🟡 | `docker-compose.yml` y Dockerfiles escritos, sin probar (Docker no está instalado). API y web verificadas por separado; en WSL, PostgreSQL lo instala `setup_wsl_hpc.sh`. |
-| HU-05 | Comprobar MPI, OpenMP y CUDA en el hardware del equipo | 🟡 | OpenMP (C++) y MPI (C) verificados en WSL; `mpi4py` y la compilación con pybind11 se verifican al ejecutar `setup_wsl_hpc.sh`; CUDA con el cuaderno de Colab (requiere subir el código a GitHub). |
+| HU-04 | Levantar base de datos, API y frontend con un comando | 🟡 | `docker-compose.yml` y Dockerfiles escritos, sin probar (Docker no está instalado). API y web verificadas por separado; PostgreSQL funcionando en WSL con la migración aplicada. |
+| HU-05 | Comprobar MPI, OpenMP y CUDA en el hardware del equipo | 🟡 | **OpenMP y MPI ✅** en WSL: núcleo compilado con pybind11, mpi4py sobre OpenMPI 5.0.10, 69 pruebas sin omisiones y primeros benchmarks (`05_Entorno_Desarrollo_HPC.md`, secciones 2.2 y 2.3). **CUDA pendiente:** ejecutar el cuaderno de Colab. |
 | — | Decisiones registradas (ADR-001 a ADR-008) | ✅ | `Documentacion Tecnica/ADR/` |
 | — | Cuaderno del piloto LSTM en el repositorio | 🟡 | Falta que el equipo lo copie a `notebooks/legacy/` |
 | — | Licencia del proyecto | 🟡 | Decisión del equipo y del director (derechos de autor, Ley 23 de 1982) |

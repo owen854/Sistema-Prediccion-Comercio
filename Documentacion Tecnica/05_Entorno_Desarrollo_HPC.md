@@ -51,9 +51,53 @@
 - El resultado es **idéntico bit a bit** con 1 y con 8 hilos, y coincide con una implementación ingenua (incluidos los `NaN`).
 - Con 8 hilos empeora: la máquina tiene 4 núcleos físicos (8 hilos lógicos comparten núcleo) y una sola media móvil es una operación limitada por la memoria que tarda milisegundos, así que el costo de coordinar hilos pesa más que el cálculo. **Lección para la Fase 3:** calcular varias variables en una sola pasada por serie (más trabajo por hilo) y medir con *h* ≤ 4.
 
-**MPI en C** (OpenMPI 5.0.10, WSL): `MPI_Reduce` correcto con 4 y con 8 procesos. La prueba con `mpi4py` y el benchmark de origen móvil quedan listos para ejecutarse cuando se instale uv en WSL (sección 3.1).
+**MPI en C** (OpenMPI 5.0.10, WSL): `MPI_Reduce` correcto con 4 y con 8 procesos.
 
-**Backend en Windows:** el núcleo corre en modo secuencial con respaldo NumPy; 47 pruebas aprobadas, incluida la que confirma que los módulos migrados reproducen exactamente los resultados del prototipo.
+**Backend en Windows:** el núcleo corre en modo secuencial con respaldo NumPy; 49 pruebas aprobadas, incluida la que confirma que los módulos migrados reproducen exactamente los resultados del prototipo.
+
+### 2.2 Estado después de `setup_wsl_hpc.sh` (17/11/2026)
+
+| Componente | Estado |
+|---|---|
+| CMake 4.2.3, Ninja, uv 0.13.9 | Instalados |
+| Entorno de Python | `~/.venvs/prediccion-demanda`, Python 3.12.16; `UV_PROJECT_ENVIRONMENT` en `~/.bashrc` |
+| Núcleo OpenMP (`forecast_hpc_kernels`) | Compilado con pybind11; 8 hilos, OpenMP 4.5 (`_OPENMP = 201511`) |
+| mpi4py | Funciona sobre OpenMPI 5.0.10 |
+| PostgreSQL | Activo; migración `0001` aplicada (`comercio`, `usuario`, `trabajo`) |
+| Pruebas | **69 aprobadas, ninguna omitida** (`pytest -m "not cuda"`), incluidas equivalencia OpenMP y MPI con 2 y 3 procesos |
+
+La integración continua de GitHub (Ubuntu) da el mismo resultado: backend, núcleos C++ y frontend en verde.
+
+### 2.3 Primeros benchmarks desde Python (WSL, datos sintéticos)
+
+**MPI** — validación con origen móvil (24 particiones, horizonte 14, paso 7) sobre 500 series × 1.460 días; el proceso raíz genera el panel y lo envía a los demás (`bcast`). Mediana de 8 corridas por configuración:
+
+| Procesos | Tiempo | Aceleración | Eficiencia |
+|---|---|---|---|
+| 1 | 1,78 s | 1,00 | 1,00 |
+| 2 | 1,06 s | 1,68 | 0,84 |
+| 4 | 0,78 s | 2,28 | 0,57 |
+| 8 (sobresuscripción) | 0,82 s | 2,18 | 0,27 |
+
+- Fracción paralelizable estimada con la ley de Amdahl: ***f* ≈ 0,69**. La parte secuencial incluye en buena medida el envío del panel completo a cada proceso.
+- Con 8 procesos no mejora: el equipo tiene 4 núcleos físicos.
+- **Lección para la Fase 3:** repartir solo los bloques de series que necesita cada proceso, o que cada proceso lea su parte del Parquet, en lugar de enviar el panel completo.
+
+**OpenMP** — media móvil de 28 días sobre 1.460 días × 2.000 series, mediana de 5 repeticiones:
+
+| Implementación | Hilos | Tiempo | Aceleración (frente a 1 hilo) |
+|---|---|---|---|
+| Referencia NumPy/pandas | 1 | 73 ms | — |
+| Núcleo C++ desde Python | 1 | 13,3 ms | 1,00 |
+| Núcleo C++ desde Python | 2 | 10,9 ms | 1,22 |
+| Núcleo C++ desde Python | 4 | 13,0 ms | 1,02 |
+| Núcleo C++ desde Python | 8 | 10,9 ms | 1,22 |
+
+- El núcleo C++ es unas **5,5 veces más rápido que la referencia NumPy**, y el resultado es idéntico con cualquier número de hilos.
+- La aceleración por hilos desde Python es baja, cuando en C++ puro llegaba a 1,90× con 2 hilos (sección 2.1). La causa más probable es que en cada llamada el enlace reacomoda la matriz de orden por filas (C) a orden por columnas (Fortran), y esa copia no se paraleliza.
+- **Lección para la Fase 3:** guardar el panel una sola vez en orden por columnas y calcular varias variables en la misma pasada, para que el trabajo paralelo domine sobre la copia.
+
+Resultados completos con la descripción del hardware en `Codigo Fuente/experiments/results/spike/` (no versionado). Para mediciones limpias, vaciar esa carpeta antes de cada campaña: el resumen MPI agrupa todas las corridas que encuentre.
 
 ---
 

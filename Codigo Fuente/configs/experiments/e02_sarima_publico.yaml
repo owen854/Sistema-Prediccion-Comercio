@@ -1,0 +1,17 @@
+# SARIMA/SARIMAX con órdenes por AIC sobre el índice EMC. Se completa en la Fase 2 (Sprint 2).
+
+nombre: e02_sarima_publico
+objetivo: OE2
+datos:
+  panel: panel_lstm_informe
+  frecuencia: MS
+modelos: [sarima, sarimax]
+validacion:
+  metodo: origen_movil
+  primer_origen: "2024-07"
+  ultimo_origen: "2026-06"
+  horizonte: 1
+  paso: 1
+semillas: { grupos: 4, por_grupo: 5 }
+metricas: [rmse, mape, mae]
+estrategia: secuencial

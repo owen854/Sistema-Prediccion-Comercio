@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Python, OpenMP, MPI)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Codigo Fuente/backend"
+    steps:
+      - uses: actions/checkout@v4
+      - name: OpenMPI
+        run: sudo apt-get update && sudo apt-get install -y openmpi-bin libopenmpi-dev
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: "Codigo Fuente/backend/uv.lock"
+      - name: Dependencias (incluye mpi4py y núcleos OpenMP compilados)
+        run: uv sync --frozen --extra hpc --extra kernels
+      - name: Estilo
+        run: uv run ruff format --check . && uv run ruff check .
+      - name: Tipos
+        run: uv run mypy
+      - name: Pruebas (incluye equivalencia OpenMP y MPI con 2 y 3 procesos)
+        run: uv run pytest -m "not cuda" --cov --cov-report=term
+
+  kernels-cpp:
+    name: Núcleos C++ (prueba nativa)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Codigo Fuente/hpc_kernels"
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DHPC_KERNELS_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build
+      - run: ctest --test-dir build --output-on-failure
+
+  frontend:
+    name: Frontend (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "Codigo Fuente/frontend"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: "Codigo Fuente/frontend/package-lock.json"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build

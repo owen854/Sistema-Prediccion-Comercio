@@ -1,0 +1,105 @@
+[project]
+name = "sistema-prediccion-demanda"
+version = "0.0.1"
+description = "Sistema de predicción de demanda para el comercio minorista fronterizo de Norte de Santander"
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+authors = [
+    { name = "Jesus David Leal Espinel" },
+    { name = "Juan Felipe Mantilla Claro" },
+    { name = "Andres Felipe Florez Mora" },
+]
+# Entorno base: núcleo analítico + API + pruebas (liviano, funciona en Windows y Linux).
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "pyarrow>=17",
+    "pyyaml>=6.0",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
+]
+
+[project.optional-dependencies]
+# Modelos estadísticos (Fase 2): SARIMA, Prophet, festivos de Colombia.
+stats = ["statsmodels>=0.14", "prophet>=1.1.6", "holidays>=0.60", "scipy>=1.14"]
+# Deep learning (Fases 2 y 3). En Colab se usa el PyTorch con CUDA que ya trae el entorno.
+dl = ["torch>=2.5"]
+# MPI (Fase 3). Requiere OpenMPI (WSL/Linux) o MS-MPI (Windows) instalado en el sistema.
+hpc = ["mpi4py>=4.0"]
+# Núcleos C++ con OpenMP (Fase 3). Solo se compilan en Linux (WSL, Colab, CI): ADR-003.
+kernels = ["forecast-hpc-kernels ; sys_platform == 'linux'"]
+# Seguimiento de experimentos y figuras (Fase 2).
+experiments = ["mlflow>=2.17", "matplotlib>=3.9"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "hypothesis>=6.115",
+    "httpx>=0.27",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pandas-stubs>=2.2",
+    "types-pyyaml>=6.0",
+    "pre-commit>=4.0",
+]
+
+[tool.uv.sources]
+forecast-hpc-kernels = { path = "../hpc_kernels" }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/forecast_core", "src/forecast_api"]
+
+# --------------------------------------------------------------------------- calidad
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "PT", "RUF", "NPY", "PD", "S"]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # texto en español con tildes y signos (×, ≤, →)
+    "N803", "N806",                # nombres matemáticos en mayúscula (T, N, X, Y)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PD", "S101", "S603"]  # assert y subprocess (mpiexec) son normales en pruebas
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["forecast_core", "forecast_api"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["mpi4py.*", "forecast_hpc_kernels.*", "torch.*", "mlflow.*", "statsmodels.*", "prophet.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "mpi: requiere mpi4py y mpiexec (se ejecuta en WSL/Linux)",
+    "cuda: requiere PyTorch con una GPU NVIDIA (Colab)",
+    "kernels: requiere el módulo compilado forecast_hpc_kernels",
+    "integration: prueba de integración (API, base de datos, migraciones)",
+]
+
+[tool.coverage.run]
+source = ["forecast_core", "forecast_api"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

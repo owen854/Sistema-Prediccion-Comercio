@@ -1,0 +1,24 @@
+# Ganchos de Git (opcionales). Activarlos una vez por equipo:
+#   cd "Codigo Fuente/backend" && uv run pre-commit install --config ../../.pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+        files: ^Codigo Fuente/
+      - id: trailing-whitespace
+        files: ^Codigo Fuente/
+
+  # Misma versión de ruff que fija backend/uv.lock (actualizar juntas).
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.5
+    hooks:
+      - id: ruff-format
+        files: ^Codigo Fuente/backend/
+      - id: ruff
+        files: ^Codigo Fuente/backend/
+        args: ["--config", "Codigo Fuente/backend/pyproject.toml"]

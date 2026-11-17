@@ -1,0 +1,4 @@
+{
+  "descripcion": "Registro de cada archivo de datos: fuente, fecha de descarga y hash SHA-256 (RF-11). Lo actualiza el pipeline de ingesta.",
+  "archivos": []
+}

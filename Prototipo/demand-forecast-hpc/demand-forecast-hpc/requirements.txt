@@ -1,0 +1,9 @@
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+statsmodels      # Etapa 2: SARIMA
+prophet          # Etapa 2: Prophet
+torch            # Etapa 3: LSTM + CUDA (instalar la build con CUDA desde pytorch.org)
+mpi4py           # Etapa 4: MPI (requiere OpenMPI o MS-MPI instalado)

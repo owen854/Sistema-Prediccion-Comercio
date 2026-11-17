@@ -1,0 +1,16 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "forecast-hpc-kernels"
+version = "0.0.1"
+description = "Núcleos C++ con OpenMP para el cálculo de variables sobre paneles T×N (RF-35)"
+requires-python = ">=3.12"
+dependencies = ["numpy>=2.1"]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.18"
+cmake.build-type = "Release"
+wheel.packages = ["python/forecast_hpc_kernels"]

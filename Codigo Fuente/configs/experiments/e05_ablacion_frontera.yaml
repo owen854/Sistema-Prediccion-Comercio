@@ -1,0 +1,17 @@
+# Cada modelo con y sin variables fronterizas (RF-44). Se completa en la Fase 2 (Sprint 2).
+
+nombre: e05_ablacion_frontera
+objetivo: OE2
+datos:
+  panel: panel_lstm_informe
+  frecuencia: MS
+modelos: [sarimax, prophet, lstm]
+validacion:
+  metodo: origen_movil
+  primer_origen: "2024-07"
+  ultimo_origen: "2026-06"
+  horizonte: 1
+  paso: 1
+semillas: { grupos: 4, por_grupo: 5 }
+metricas: [rmse, mape, mae]
+estrategia: secuencial

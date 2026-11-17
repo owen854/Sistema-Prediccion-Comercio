@@ -1,0 +1,11 @@
+{
+  "origen": "SINTETICO (ventas y TRM)",
+  "filas": 84360,
+  "series": 60,
+  "fecha_inicio": "2023-01-01",
+  "fecha_fin": "2026-11-06",
+  "dias_cubiertos": 1406,
+  "nulos": 0,
+  "negativos": 0,
+  "pct_ceros": 0.0
+}

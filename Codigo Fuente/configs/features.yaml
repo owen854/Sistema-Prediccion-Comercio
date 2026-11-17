@@ -1,0 +1,19 @@
+# Variables por frecuencia (RF-15). Se completan en la Fase 2.
+
+mensual:
+  rezagos_objetivo: 12          # piloto LSTM: 12 meses previos de la variación anual
+  objetivo: variacion_anual_log  # log(y_t) - log(y_{t-12})
+  calendario: [mes_seno, mes_coseno, diciembre]
+  exogenas:
+    - { nombre: entradas_norte_de_santander, transformacion: variacion_anual_log, rezagos: [1] }
+    - { nombre: brecha_inflacion_cucuta, transformacion: ninguna, rezagos: [0, 1] }
+
+semanal:
+  rezagos_objetivo: [1, 2, 4, 52]
+  ventanas_moviles: [4, 8, 13]
+  calendario: [semana_seno, semana_coseno, festivos_en_semana, quincena_en_semana, diciembre]
+
+diaria:
+  rezagos_objetivo: [1, 7, 14, 28]
+  ventanas_moviles: [7, 14, 28]
+  calendario: [dia_semana_seno, dia_semana_coseno, festivo, quincena, diciembre, evento_frontera]

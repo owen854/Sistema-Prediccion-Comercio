@@ -1,0 +1,8 @@
+# Los scripts de Linux/WSL deben conservar fin de línea LF (con CRLF fallan en bash).
+*.sh text eol=lf
+Makefile text eol=lf
+# Los scripts de PowerShell, con CRLF.
+*.ps1 text eol=crlf
+# Archivos de bloqueo: sin conversión ni diferencias ruidosas.
+uv.lock -diff
+package-lock.json -diff

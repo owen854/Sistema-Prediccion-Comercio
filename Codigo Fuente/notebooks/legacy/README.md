@@ -1,10 +1,12 @@
-# Cuaderno del piloto LSTM (pendiente)
+# Cuaderno del piloto LSTM
 
-El Informe de evidencia OE1/OE2 se generó con un cuaderno de Python en Google Colab que lee los archivos originales del DANE y de Migración Colombia y produce cada tabla y figura, incluida la prueba piloto de la LSTM en NumPy (MAPE medio 3,82 %).
+El cuaderno original de Colab con el que se generó el *Informe de evidencia OE1/OE2* no está disponible.
 
-**Ese cuaderno todavía no está en el repositorio.** Debe copiarse aquí (actividad 0.8 de la Fase 0), porque:
+**Decisión del equipo (17/11/2026):** no se reemplaza con datos sintéticos. El piloto usó solo datos públicos
+que el sistema ya tiene reales (índice de ventas de la EMC y entradas por Norte de Santander), así que se
+**reconstruye a partir de la descripción del informe** (sección IV-B: 12 rezagos de la variación anual del
+logaritmo de las ventas, variación anual de las entradas, mes en seno y coseno, una capa LSTM de 8 unidades,
+ensamble de 5 redes entrenadas 400 épocas con Adam, origen móvil de jul-2024 a jun-2026 y 4 grupos de semillas).
 
-1. Es la referencia para reproducir el OE1 y el OE2 desde `forecast_core` (Fases 1 y 2).
-2. Contiene las decisiones exactas de preparación de datos (empalmes, rezagos, semillas).
-
-Para agregarlo: en Colab, *Archivo → Descargar → Descargar .ipynb*, y guardarlo en esta carpeta como `piloto_lstm_informe_oe1_oe2.ipynb`.
+La reconstrucción es la historia **HU-15** de la Fase 2 (`configs/experiments/e04_lstm_publico.yaml`).
+Si en algún momento aparece el cuaderno original, se guarda aquí para comparar.

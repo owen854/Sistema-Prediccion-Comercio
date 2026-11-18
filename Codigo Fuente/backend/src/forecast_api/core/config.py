@@ -23,6 +23,17 @@ class Settings(BaseSettings):
     database_connect_timeout_s: int = 3
     cors_origins: list[str] = ["http://localhost:3000"]
     log_level: str = "INFO"
+    # Clave HMAC para seudonimizar comercios y puntos de venta (RF-08). Obligatoria fuera de
+    # desarrollo; en desarrollo se usa una clave fija y se registra una advertencia.
+    pseudonym_key: str = ""
+    max_upload_mb: int = 10  # RNF-16
+
+    def pseudonym_key_bytes(self) -> bytes:
+        if self.pseudonym_key:
+            return self.pseudonym_key.encode("utf-8")
+        if self.environment == "produccion":
+            raise RuntimeError("Defina FORECAST_PSEUDONYM_KEY en producción.")
+        return b"clave-solo-para-desarrollo"
 
 
 @lru_cache

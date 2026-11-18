@@ -1,4 +1,50 @@
 {
   "descripcion": "Registro de cada archivo de datos: fuente, fecha de descarga y hash SHA-256 (RF-11). Lo actualiza el pipeline de ingesta.",
-  "archivos": []
+  "archivos": [
+    {
+      "archivo": "data/raw/public/anex-EMC-SeriesIndiceEmpalmados-ago2026.xlsx",
+      "fuente": "DANE - EMC",
+      "url": "https://www.dane.gov.co/files/operaciones/EMC/anex-EMC-SeriesIndiceEmpalmados-ago2026.xlsx",
+      "descripcion": "Índices empalmados del comercio al por menor, corte agosto 2026 (mismo del informe)",
+      "bytes": 294808,
+      "sha256": "4e5fb90568eb442613abb2b9259c6df67753868752900e0a64a7842319d4f941",
+      "registrado_en": "2026-11-17T22:38:17+00:00"
+    },
+    {
+      "archivo": "data/raw/public/anex-IPC-sep2026.xlsx",
+      "fuente": "DANE - IPC",
+      "url": "https://www.dane.gov.co/files/operaciones/IPC/sep2026/anex-IPC-sep2026.xlsx",
+      "descripcion": "Anexo mensual del IPC, septiembre 2026 (hoja 4: variación mensual por ciudades)",
+      "bytes": 342625,
+      "sha256": "7c4dac75151338e729cadc349d8fb3e59fb566affe4100c90af7fae98ef04228",
+      "registrado_en": "2026-11-17T22:38:17+00:00"
+    },
+    {
+      "archivo": "data/raw/public/migracion_nds_96sh-4v8d.json",
+      "fuente": "Migración Colombia (datos.gov.co)",
+      "url": "https://www.datos.gov.co/resource/96sh-4v8d.json",
+      "descripcion": "Entradas por año, mes y puesto (5 puestos de Norte de Santander)",
+      "bytes": 46900,
+      "sha256": "bd1c8aea2d14fc86d7588ed44f09cc57be2288f8f0be5848a3f5ff8df117a3b9",
+      "registrado_en": "2026-11-17T22:38:17+00:00"
+    },
+    {
+      "archivo": "data/raw/public/trm_32sa-8pi3.json",
+      "fuente": "Superintendencia Financiera (datos.gov.co)",
+      "url": "https://www.datos.gov.co/resource/32sa-8pi3.json",
+      "descripcion": "TRM diaria desde 2012",
+      "bytes": 422394,
+      "sha256": "3d240aa2b0cdad184d4d4766cc6c3095e34957e51cecb74bb4e1a367494339e2",
+      "registrado_en": "2026-11-17T22:38:17+00:00"
+    },
+    {
+      "archivo": "data/synthetic/ipc_variacion_mensual_ciudades_sintetico.csv",
+      "fuente": "Generador sintético (forecast_core.ingestion.synthetic.generate_city_cpi)",
+      "url": null,
+      "descripcion": "IPC SINTÉTICO por ciudades: solo para probar el pipeline, no es evidencia.",
+      "bytes": 8304,
+      "sha256": "808d6e93839418834738f5b2eb0a16ddee43813e40f5ce0f2596ef9cc2863ee2",
+      "registrado_en": "2026-11-17T23:23:34+00:00"
+    }
+  ]
 }

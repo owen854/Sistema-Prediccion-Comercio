@@ -17,6 +17,7 @@ Sistema de predicción de demanda para MIPYMES del comercio minorista fronterizo
 | `backend/` | Python: `forecast_core` (núcleo analítico) y `forecast_api` (FastAPI). Pruebas en `backend/tests/`. |
 | `hpc_kernels/` | Núcleos C++ con OpenMP expuestos a Python con pybind11. |
 | `frontend/` | Next.js: solo presentación; consume la API. |
+| `plantillas/` | Plantilla de ventas para comercios (.xlsx y .csv). |
 | `configs/` | Configuración declarativa: fuentes, calendario, variables, inventario, paralelismo, experimentos. |
 | `data/` | Datos (no versionados, salvo `manifest.json`). |
 | `experiments/` | Resultados y registros de MLflow (no versionados). |
@@ -40,12 +41,18 @@ bash scripts/setup_wsl_hpc.sh
 
 ### Ejecutar
 
+El backend se ejecuta en **WSL** (en Windows hay otro PostgreSQL en el puerto 5432): en Ubuntu, `make migrate`, `make importar-publicos` y `make api`; en PowerShell, `.	asks.ps1 web`. Detalle en `Documentacion Tecnica/05_Entorno_Desarrollo_HPC.md`, sección 3.4.
+
+
 | Qué | Windows | WSL / Linux |
 |---|---|---|
 | API (http://localhost:8000/docs) | `.\tasks.ps1 api` | `make api` |
 | Web (http://localhost:3000) | `.\tasks.ps1 web` | `make web` |
 | Pruebas | `.\tasks.ps1 test` | `make test-all` |
 | Estilo y tipos | `.\tasks.ps1 lint` y `.\tasks.ps1 typecheck` | `make lint typecheck` |
+| Descargar datos públicos y armar el panel | `.\tasks.ps1 datos` | `make datos` |
+| Reproducir el OE1 frente al informe | `.\tasks.ps1 reproduce-oe1` | `make reproduce-oe1` |
+| Registrar las series públicas en la base | — | `make importar-publicos` |
 | Benchmark OpenMP | — | `make bench-omp` |
 | Benchmark MPI | — | `make bench-mpi` |
 | CUDA | Cuaderno `infra/gpu_remota/run_cuda_experiments.ipynb` en Google Colab | |

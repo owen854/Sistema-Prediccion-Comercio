@@ -150,6 +150,51 @@ def make_sales(
     return pd.concat(rows, ignore_index=True)
 
 
+# Estacionalidad mensual genérica de la inflación (puntos porcentuales sobre la base):
+# alzas a inicio de año por ajustes de precios regulados y salario, baja a mitad de año.
+CPI_MONTH_EFFECT = np.array(
+    [0.45, 0.40, 0.30, 0.15, 0.05, -0.05, -0.05, 0.0, 0.05, 0.0, 0.05, 0.15]
+)
+
+
+def generate_city_cpi(
+    start: str = "2017-01",
+    end: str = "2026-09",
+    seed: int = 2017,
+    base_monthly: float = 0.25,
+    surge_peak: float = 0.55,
+    city_sigma: float = 0.15,
+) -> pd.DataFrame:
+    """Historia SINTÉTICA de variaciones mensuales del IPC: ``Nacional`` y ``Cúcuta``.
+
+    Sirve **solo** para ejecutar de punta a punta el análisis de inflación (Patrón 3)
+    mientras no esté el archivo histórico original. Los parámetros son genéricos y
+    **no están ajustados** a las cifras del informe; los resultados no son evidencia.
+
+    Modelo (en %):
+        nacional_t = base + efecto_mes + alza_2021_2023_t + ruido(0,08)
+        cucuta_t   = nacional_t + d_t,   d_t = 0,6·d_{t−1} + ruido(city_sigma)  (media 0)
+    """
+    rng = np.random.default_rng(seed)
+    idx = pd.date_range(f"{start}-01", f"{end}-01", freq="MS")
+    t = np.arange(len(idx))
+    center = int(idx.get_indexer(pd.DatetimeIndex(["2022-06-01"]))[0])  # pico del alza
+    surge = surge_peak * np.exp(-0.5 * ((t - center) / 7.0) ** 2)
+    national = (
+        base_monthly + CPI_MONTH_EFFECT[idx.month - 1] + surge + rng.normal(0, 0.08, len(idx))
+    )
+    dev = np.zeros(len(idx))
+    for i in range(1, len(idx)):
+        dev[i] = 0.6 * dev[i - 1] + rng.normal(0, city_sigma)
+    rows = [
+        pd.DataFrame({"fecha": idx, "ciudad": ciudad, "variacion_pct": np.round(valores, 2)})
+        for ciudad, valores in (("Nacional", national), ("Cúcuta", national + dev))
+    ]
+    out = pd.concat(rows, ignore_index=True)
+    out["origin"] = DataOrigin.SINTETICO.value
+    return out
+
+
 def generate(
     n_series: int = 60,
     start: str = "2023-01-01",
